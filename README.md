@@ -33,7 +33,7 @@ All $init are run (see module template), then all $build, then all $final.
 
 
 ## Module template
-‘‘‘
+```
 bambo.module(['dep1','dep2', function(dep1, dep2) {
 
 	return {
@@ -50,7 +50,7 @@ bambo.module(['dep1','dep2', function(dep1, dep2) {
 		etc.
 	};
 }]);
-‘‘‘
+```
 $init, $build and $final methods are optional.
 
 
