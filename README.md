@@ -16,13 +16,13 @@ All $init are run (see module template), then all $build, then all $final.
 ## Usage
 
 - module(name, constructor, loadOnStartup)
-	name: string
-	constructor: function that returns an object
-	loadOnStartup: boolean, default true
+	* name: string
+	* constructor: function that returns an object
+	* loadOnStartup: boolean, default true
 
 - forEach(array, callback)
-	array: array or object (loop on properties)
-	callback: function that loops ont all elements
+	* array: array or object (loop on properties)
+	* callback: function that loops ont all elements
 
 - isString(item)
 - isObject(item)
