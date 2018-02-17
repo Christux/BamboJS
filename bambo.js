@@ -3,8 +3,8 @@ BamboJS
 
 Description : Light javascript module builder
 Author : Christophe Rubeck
-Version : 1.0
-Date : 2018 jan 21
+Version : 1.1
+Date : 2018 feb 17
 See : https://github.com/Christux/BamboJS
 *//*
 
@@ -37,6 +37,7 @@ Usage :
 	- isFunction(item)
 	- isBoolean(item)
 	- isNumber(item)
+	- isUndefinedOrNull(item)
 
 
 Module template :
@@ -47,8 +48,8 @@ Module template :
 		return {
 			$init: function() {
 			},
-			$build: function() {
-			},
+			$build: ['dep3', function(dep3) {
+			}],
 			$final: function() {
 			},
 			method1: function() {
@@ -131,6 +132,7 @@ Module template :
 			isFunction: isFunction,
 			isBoolean: isBoolean,
 			isNumber: isNumber,
+			isUndefinedOrNull: isUndefinedOrNull, 
 			forEach: forEach
 		});
 
@@ -185,6 +187,10 @@ Module template :
 		return typeof val === 'number';
 	}
 
+	function isUndefinedOrNull(val) {
+		return typeof val === 'undefined' || val === null;
+	}
+
 	function forEach(array,callback) {
 
 		if(!isObject(array) && !isArray(array)) {
@@ -205,8 +211,7 @@ Module template :
 			var i=0;
 			for(var pptName in array) {
 				if(array.hasOwnProperty(pptName)) {
-					callback(array[pptName],i);
-					i++;
+					callback(array[pptName],i++);
 				}
 			}
 		}
@@ -223,7 +228,7 @@ Module template :
 			 * Registration of itself
 			 */
 
-			modules['$injector'] = createSingleton(null,false,this);
+			modules['$injector'] = createSingleton('$injector',null,false,this);
 			
 			return this;
 
@@ -234,7 +239,7 @@ Module template :
 			 */
 
 			register: function (name, constructor, loadOnStartup) {
-				addModule(name, createSingleton(constructor, loadOnStartup || false));
+				addModule(name, createSingleton(name, constructor, loadOnStartup || false));
 			},
 			resolve: function (func, deps, extDependencies) {
 				return resolve(func, deps, modules, extDependencies, 0);
@@ -249,17 +254,15 @@ Module template :
 
 		//-----------------------------------------------------------
 
-		function createSingleton(constructor, startup, instance) {
+		function createSingleton(name, constructor, loadOnStartup, instance) {
 
 			var instance = instance || undefined;
 
 			return {
 				getInstance: function(recursionLevel) {
 
-					var recursionLevel = isNumber(recursionLevel) ? recursionLevel + 1 : 0;
-
 					if(!isInstanciated()){
-						instance = resolve(constructor, [], modules, {}, recursionLevel);
+						instance = instanciate(recursionLevel);
 					}
 					return instance;
 				},
@@ -267,7 +270,7 @@ Module template :
 					return isInstanciated();
 				},
 				loadOnStartup: function() {
-					return startup;
+					return loadOnStartup;
 				}
 			};
 
@@ -275,15 +278,25 @@ Module template :
 			function isInstanciated() {
 				return isObject(instance);
 			}
+
+			function instanciate(recursionLevel) {
+
+				var recursionLevel = isNumber(recursionLevel) ? recursionLevel + 1 : 0;
+				
+				var obj = resolve(constructor, [], modules, {}, recursionLevel);
+
+				if (!isObject(obj)) {
+					throw new Error('Module ' + name + ' constructor is not correctly defined, it must return an object');
+				}
+
+				return obj;
+			}
 		}
 
 		function addModule(name, obj) {
 
 			if (modules.hasOwnProperty(name)) {
 				throw new Error('Module ' + name + ' is already registered');
-			}
-			if (!isObject(obj)) {
-				throw new Error('Module ' + name + ' is not correctly defined, it must be an object');
 			}
 
 			modules[name] = obj;

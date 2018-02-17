@@ -166,6 +166,16 @@
 			.toThrowError('Loop in module dependencies detected');
 		});
 
+		it("Define module with wrong constructor", function() {
+
+			bambo.module('wrong', function(){return true;});
+
+			expect(function(){
+				return $injector.resolve(function(){}, ['wrong']);
+			})
+			.toThrowError('Module wrong constructor is not correctly defined, it must return an object');
+		});
+
 	});
 
 })();

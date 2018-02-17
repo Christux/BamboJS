@@ -27,6 +27,7 @@
 			expect(bambo.isObject(4)).toBe(false);
 			expect(bambo.isObject(function(){})).toBe(false);
 			expect(bambo.isObject(true)).toBe(false);
+			expect(bambo.isObject(bambo.cornichon)).toBe(false);
 		});
 
 		it("isArray", function() {
@@ -79,6 +80,17 @@
 			expect(bambo.isNumber(true)).toBe(false);
 		});
 
+		it("isUndefinedOrNull", function() {
+			expect(bambo.isUndefinedOrNull({})).toBe(false);
+			expect(bambo.isUndefinedOrNull('true')).toBe(false);
+			expect(bambo.isUndefinedOrNull(null)).toBe(true);
+			expect(bambo.isUndefinedOrNull(['bob','joe'])).toBe(false);
+			expect(bambo.isUndefinedOrNull(4)).toBe(false);
+			expect(bambo.isUndefinedOrNull(function(){})).toBe(false);
+			expect(bambo.isUndefinedOrNull(true)).toBe(false);
+			expect(bambo.isUndefinedOrNull(bambo.cornichon)).toBe(true);
+		});
+
 		it("forEach", function() {
 			expect(function() {
 				return bambo.forEach('hello');
@@ -93,8 +105,15 @@
 				result[idx] = val;
 			});
 
+			bambo.forEach({name:'bob',forename:'joe'}, function(val, idx){
+				result[idx+2] = val;
+			});
+
 			expect(result[0]).toBe('bob');
 			expect(result[1]).toBe('joe');
+
+			expect(result[2]).toBe('bob');
+			expect(result[3]).toBe('joe');
 		});
 	
 	});
