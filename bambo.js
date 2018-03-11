@@ -3,8 +3,8 @@ BamboJS
 
 Description : Light javascript module builder
 Author : Christophe Rubeck
-Version : 1.1
-Date : 2018 feb 17
+Version : 1.2
+Date : 2018 march 11
 See : https://github.com/Christux/BamboJS
 *//*
 
@@ -88,6 +88,7 @@ Module template :
 			injector.register('$observer', createObserverModule);
 			injector.register('$location', createLocationModule);
 			injector.register('$flux', createFluxModule);
+			injector.register('$konami', createKonami);
 
 			/*
 			* Initialize all sub-object
@@ -645,6 +646,51 @@ Module template :
 		function isActionString(action) {
 			if(!isString(action))
 				throw new Error('Action parameter must be a string !');
+		}
+	}
+
+	//////////////// KONAMI ////////////////////////////////////////////
+	function createKonami() {
+
+		var pattern = "38384040373937396665";
+		var input = "";
+		var observer = createObserver();
+		var timer = null;
+
+		return (function(){
+
+			document.addEventListener("keydown", keydownHandler);
+
+			return this;
+			})
+			.call({
+				registerHandler: observer.registerHandler,
+				unregisterHandler: observer.unregisterHandler
+			});
+
+		// ----------------------------------------------------
+		function keydownHandler (e) {
+			clearTimeout(timer);
+
+			input += e ? e.keyCode : event.keyCode;
+
+			timer = setTimeout(cleanup, 1000);
+
+			if (input.length > pattern.length) {
+				input = input.substr((input.length - pattern.length));
+			}
+
+			if (input === pattern) {
+				console.log("Konami activated");
+				observer.notifyAll();
+				cleanup();
+				e.preventDefault();
+			}
+		}
+
+		function cleanup() {
+			clearTimeout(timer);
+			input = '';
 		}
 	}
 
